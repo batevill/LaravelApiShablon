@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ProductService;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ProductController extends Controller
 {
@@ -15,9 +16,13 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->getAllProducts();
+        $filters = Arr::get($request, 'filters', []);
+        $sort = Arr::get($request, 'sort', []);
+        $limit = Arr::get($request, 'limit', 20);
+
+        $products = $this->productService->getAllProducts($filters, $sort, $limit);
         return $products;
     }
 

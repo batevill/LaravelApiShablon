@@ -14,10 +14,46 @@ class ProductRepository
         $this->model = $product;
     }
 
-    public function all()
+    public function all($filters, $sort, $limit)
     {
-        $products = $this->model->paginate(2);
-        return ProductResource::collection($products);
+        $query = $this->model->query();
+        foreach ($filters as $filter) {
+
+            if ($filter['operator'] == 'between' && $filter['column'] == 'created_at') {
+
+                if (count(explode('_', $filter['value'])) != 2) {
+                    continue;
+                }
+
+                $date = explode('_', $filter['value']);
+
+                $fromDate = new \DateTimeImmutable($date[0]);
+                $toDate = new \DateTimeImmutable($date[1]);
+
+                $query->whereBetween(
+                    $filter['column'],
+                    [
+                        $fromDate->getTimestamp(),
+                        $toDate->getTimestamp()
+                    ]
+                );
+            } else {
+                $query->where(
+                    $filter['column'],
+                    $filter['value'],
+                    $filter['operator']
+                );
+            }
+        }
+
+        if (!empty($sort)) {
+            $query->orderBy($sort['column'], $sort['value']);
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+        $collections = $query->paginate($limit);
+
+        return ProductResource::collection($collections);
     }
 
     public function find($id)
