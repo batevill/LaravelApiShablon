@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id(); // Auto-incrementing primary key
-            $table->string('name'); // Product name
-            $table->text('description')->nullable(); // Product description
-            $table->decimal('price', 8, 2); // Product price with two decimal places
-            $table->integer('quantity')->default(0); // Product quantity
-            $table->timestamps(); // Created_at and Updated_at columns
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->integer('quantity')->default(0);
+            $table->tinyInteger('status')->default(1);
+            $table->timestamps();
         });
     }
 
